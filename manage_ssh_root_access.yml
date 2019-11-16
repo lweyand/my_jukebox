@@ -1,0 +1,26 @@
+---
+- hosts: jukebox
+  gather_facts: Yes
+
+
+  tasks:
+    - name: Allow root login
+      include: includes/sshd.yml
+      vars:
+        sshd_regexp: '^#PermitRootLogin prohibit-password$'
+        sshd_line: 'PermitRootLogin yes'
+      when: action == "allow"
+
+    - name: Prohibit root login
+      include: includes/sshd.yml
+      vars:
+        sshd_regexp: '^PermitRootLogin yes$'
+        sshd_line: '#PermitRootLogin prohibit-password'
+      when: action == "prohibit"
+
+  handlers:
+    - name: restart sshd
+      become: yes
+      service:
+        name: sshd
+        state: restarted

@@ -1,0 +1,21 @@
+---
+
+rtcwake:
+  #extinction de 01:00 à 03:55 LMMJV
+  - name: "Night stop"
+    minute: "00"
+    hour: "01"
+    weekday: "1-5"
+    sleep_time: 7255
+  # extinction de 08:30 à 18:00 LMMJV
+  - name: "Morning stop"
+    minute: "30"
+    hour: "08"
+    weekday: "1-5"
+    sleep_time: 32430
+  # extinction de 01:00 à 08:00 SD
+  - name: "Weekend stop"
+    minute: "00"
+    hour: "01"
+    weekday: "6-7"
+    sleep_time: 25200

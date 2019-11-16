@@ -1,0 +1,37 @@
+---
+
+- name: install samba
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - samba
+
+- name: Create files directory
+  become: yes
+  file:
+    path: "{{ samba_home_dir }}"
+    state: directory
+    mode: 02770
+    owner: "{{ user }}"
+    group: "jukebox"
+
+- name: set Samba passwords for each user
+  become: yes
+  shell: "printf '{{ samba_passwd }}\n{{ samba_passwd }}\n' | smbpasswd -s -a {{ samba_user }}"
+  register: smbpasswd
+  changed_when: "'Added user' in smbpasswd.stdout"
+  notify:
+    - restart samba
+
+- name: Configure global samba
+  become: yes
+  template:
+    src: templates/samba/smb.conf
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart samba

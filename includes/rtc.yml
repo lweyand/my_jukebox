@@ -1,0 +1,40 @@
+---
+
+# Install rtcwake
+- name: install ifconfig
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - util-linux
+
+- name: "set-up timezone"
+  timezone:
+    name: Europe/Paris
+
+# https://www.howtogeek.com/121241/how-to-make-your-linux-pc-wake-from-sleep-automatically/
+# Types of Suspend
+#
+# The -m switch accepts the following types of suspend:
+#  standby – Standby offers little power savings, but restoring to a running system is very quick. This is the default
+#            mode if you omit the -m switch.
+#  mem     – Suspend to RAM. This offers significant power savings – everything is put into a low-power state, except
+#            your RAM. The contents of your memory are preserved.
+#  disk    – Suspend to disk. The contents of your memory are written to disk and your computer is powered off. The
+#            computer will turn on and its state will be restored when the timer completes.
+#  off     – Turn the computer off completely. rtcwake’s man page notes that restoring from “off” isn’t officially
+#            supported by the ACPI specification, but this works with many computers anyway.
+#  no      – Don’t suspend the computer immediately, just set the wakeup time. For example, you could tell your computer
+#            to wake up at 6am. After that, can put it to sleep manually at 11pm or 1am – either way, it will wake up
+#            at 6am.
+- name: "Apply shutdown and sleep time rules"
+  become: yes
+  cron:
+    name: "{{ item.name }}"
+    minute: "{{ item.minute }}"
+    hour: "{{ item.hour }}"
+    weekday: "{{ item.weekday }}"
+    job: "/usr/sbin/rtcwake -m mem -s {{ item.sleep_time }}"
+  with_items:
+    - "{{ rtcwake }}"

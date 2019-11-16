@@ -1,0 +1,33 @@
+---
+
+- hosts: jukebox
+  gather_facts: Yes
+
+  tasks:
+    - name: include os tasks
+      include: includes/debian.yml
+    - name: include lvm tasks
+      include: includes/lvm.yml
+    - name: include unattended-upgrades tasks
+      include: includes/unattended-upgrades.yml
+    - name: include samba tasks
+      include: includes/samba.yml
+    - name: include rtc tasks
+      include: includes/rtc.yml
+
+  handlers:
+    - name: restart samba
+      become: yes
+      service:
+        name: smbd
+        state: restarted
+    - name: restart apt-daily.timer
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: apt-daily.timer
+    - name: restart service apt-daily-upgrade.timer
+      systemd:
+        state: restarted
+        daemon_reload: yes
+        name: apt-daily-upgrade.timer

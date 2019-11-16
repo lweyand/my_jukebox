@@ -1,0 +1,85 @@
+---
+
+- name: install lvm
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - lvm2
+
+
+
+- name: Unmount {{ target_dir }}
+  become: yes
+  mount:
+    path: "{{ target_dir }}"
+    state: unmounted
+
+- name: get vg names list
+  become: yes
+  shell: vgs --noheadings -o vg_name | tr -d '  '
+  register: vg_names
+
+  #- name: get device mapped on {{ target_dir }}
+  #  shell: "df -P | grep {{ target_dir }} | awk '{print $1}'"
+  #  register: device_name
+  #- name: get device size on {{ target_dir }}
+  #  shell: "df -P -h | grep {{ target_dir }} | awk '{print $2}'"
+  #  register: device_size
+- name: get existing pv device
+  #  shell: pvs -o pv_name,dev_size,vg_name --noheadings | grep {{ lvm_vg_name }}
+  #  register: vg_size
+#  when: lvm_vg_name in vg_names.stdout_lines
+  set_fact:
+    device_name: "{{ default_target_device }}"
+
+- name: get existing vg size
+  #  shell: vgs {{ lvm_vg_name }} --units g -o vg_size --noheadings
+  #  register: vg_size
+#  when: lvm_vg_name in vg_names.stdout_lines
+  set_fact:
+    device_size: "{{ default_target_size }}"
+
+
+- name: Create a volume group on top of {{ device_name }} with physical extent size = {{ device_size }}
+  become: yes
+  lvg:
+    vg: "{{ lvm_vg_name }}"
+    pvs: "{{ device_name }}"
+#    pesize: "{{ device_size }}"
+  when: lvm_vg_name not in vg_names.stdout_lines
+
+- name: debug pv
+  become: yes
+  command: pvscan
+
+- name: debug vg
+  become: yes
+  command: vgscan
+
+- name: Create a logical volume  {{ lvm_lv_name }} of {{ device_size }}
+  become: yes
+  lvol:
+    vg: "{{ lvm_vg_name }}"
+    lv: "{{ lvm_lv_name }}"
+    size: "{{ device_size }}"
+
+- name: Get lv path
+  become: yes
+  shell: lvs {{ lvm_vg_name }} -o lv_path --noheadings  | tr -d '  '
+  register: lv_path
+
+- name: format logical volume  {{ lv_path.stdout }}
+  become: yes
+  filesystem:
+    fstype: ext4
+    dev: "{{ lv_path.stdout }}"
+
+- name: mount {{ lv_path.stdout }}
+  become: yes
+  mount:
+    path: "{{ target_dir }}"
+    src: "{{ lv_path.stdout }}"
+    fstype: ext4
+    state: mounted

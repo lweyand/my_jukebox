@@ -1,0 +1,9 @@
+---
+
+- name: Modify sshd
+  become: yes
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '{{ sshd_regexp }}'
+    line: '{{ sshd_line }}'
+  notify: restart sshd

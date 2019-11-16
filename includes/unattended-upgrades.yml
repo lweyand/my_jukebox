@@ -1,0 +1,61 @@
+---
+
+# Unattended Upgrades documentation:
+# https://wiki.debian.org/UnattendedUpgrades
+
+- name: install unattended upgrades
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - unattended-upgrades
+    - apt-listchanges
+
+- name: Enable automatique upgrades
+  become: yes
+  copy:
+    src: "{{ uau_update_file_source }}"
+    dest: "{{ uau_update_file_target }}"
+
+- name: Configure automatique upgrades periodically
+  become: yes
+  copy:
+    src: "{{ uau_periodic_file_source }}"
+    dest: "{{ uau_periodic_file_target }}"
+
+- name: Configure upgrades
+  become: yes
+  copy:
+    src: "{{ uau_configuration_file_source }}"
+    dest: "{{ uau_configuration_file_target }}"
+
+- name: Check configuration
+  become: yes
+  command: unattended-upgrade -d
+
+- name: Create daily download dir
+  become: yes
+  file:
+    state: directory
+    path: "{{ uau_daily_download_timer_dir_target }}"
+
+- name: Configure daily download timer
+  become: yes
+  copy:
+    src: "{{ uau_daily_download_timer_file_source }}"
+    dest: "{{ uau_daily_download_timer_file_target }}"
+  notify: restart apt-daily.timer
+
+- name: Create upgrades download dir
+  become: yes
+  file:
+    state: directory
+    path: "{{ uau_daily_upgrades_timer_dir_target }}"
+
+- name: Configure upgrades download timer
+  become: yes
+  copy:
+    src: "{{ uau_daily_upgrades_timer_file_source }}"
+    dest: "{{ uau_daily_upgrades_timer_file_target }}"
+  notify: restart service apt-daily-upgrade.timer

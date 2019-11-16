@@ -1,0 +1,2 @@
+ansible_user: jukebox
+ansible_connection: ssh

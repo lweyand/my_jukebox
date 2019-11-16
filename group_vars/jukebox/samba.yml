@@ -1,0 +1,6 @@
+---
+
+samba_user: "jukebox"
+
+samba_home_dir: "{{ target_dir }}"
+samba_workgroup: "butterflyeffect"
