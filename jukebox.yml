@@ -6,14 +6,24 @@
   tasks:
     - name: include os tasks
       include: includes/debian.yml
+      tags:
+        - os
     - name: include lvm tasks
       include: includes/lvm.yml
+      tags:
+        - lvm
     - name: include unattended-upgrades tasks
       include: includes/unattended-upgrades.yml
+      tags:
+        - unattended
     - name: include samba tasks
       include: includes/samba.yml
+      tags:
+        - samba
     - name: include rtc tasks
       include: includes/rtc.yml
+      tags:
+        - rtc
 
   handlers:
     - name: restart samba
