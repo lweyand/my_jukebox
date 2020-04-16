@@ -3,10 +3,9 @@
 - name: install lvm
   become: yes
   apt:
-    name: "{{ item }}"
+    name: "lvm2"
     state: present
   with_items:
-    - lvm2
 
 
 

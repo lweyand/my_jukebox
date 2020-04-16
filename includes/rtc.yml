@@ -1,13 +1,10 @@
 ---
 
-# Install rtcwake
-- name: install ifconfig
+- name: Install rtcwake
   become: yes
-  apt:
-    name: "{{ item }}"
+  package:
+    name: "util-linux"
     state: present
-  with_items:
-    - util-linux
 
 - name: "set-up timezone"
   timezone:
@@ -36,5 +33,5 @@
     hour: "{{ item.hour }}"
     weekday: "{{ item.weekday }}"
     job: "/usr/sbin/rtcwake -m mem -s {{ item.sleep_time }}"
-  with_items:
-    - "{{ rtcwake }}"
+    state: "{% if item.state %}{{ item.state }}{% else %}present{% endif %}"
+  loop: "{{ rtcwake }}"
