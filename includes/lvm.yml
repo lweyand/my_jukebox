@@ -5,8 +5,6 @@
   apt:
     name: "lvm2"
     state: present
-  with_items:
-
 
 
 - name: Unmount {{ target_dir }}
@@ -47,7 +45,7 @@
     vg: "{{ lvm_vg_name }}"
     pvs: "{{ device_name }}"
 #    pesize: "{{ device_size }}"
-  when: lvm_vg_name not in vg_names.stdout_lines
+  when: "lvm_vg_name not in vg_names.stdout_lines"
 
 - name: debug pv
   become: yes

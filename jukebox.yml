@@ -5,32 +5,52 @@
 
   tasks:
     - name: include os tasks
-      include: includes/debian.yml
+      include_tasks: includes/debian.yml
       tags:
         - os
     - name: include lvm tasks
-      include: includes/lvm.yml
+      include_tasks: includes/lvm.yml
       tags:
         - lvm
     - name: include unattended-upgrades tasks
-      include: includes/unattended-upgrades.yml
+      include_tasks: includes/unattended-upgrades.yml
       tags:
         - unattended
     - name: include samba tasks
-      include: includes/samba.yml
+      include_tasks: includes/samba.yml
       tags:
         - samba
+    - name: include samba tasks
+      include_tasks: includes/minidlna.yml
+      tags:
+        - dlna
     - name: include rtc tasks
-      include: includes/rtc.yml
+      include_tasks: includes/rtc.yml
       tags:
         - rtc
 
   handlers:
-    - name: restart samba
+    - name: restart smbd
       become: yes
       service:
         name: smbd
         state: restarted
+      listen:
+        - restart samba
+    - name: restart nmbd
+      become: yes
+      service:
+        name: nmbd
+        state: restarted
+      listen:
+        - restart samba
+    - name: restart minidlna
+      become: yes
+      service:
+        name: minidlna
+        state: restarted
+      listen:
+        - restart minidlna
     - name: restart apt-daily.timer
       systemd:
         state: restarted

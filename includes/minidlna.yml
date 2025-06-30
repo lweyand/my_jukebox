@@ -1,0 +1,19 @@
+---
+- name: install minidlna
+  become: yes
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - minidlna
+
+- name: Configure global samba
+  become: yes
+  template:
+    src: templates/minidlna/minidlna.conf
+    dest: /etc/minidlna.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart minidlna
