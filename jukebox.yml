@@ -20,7 +20,7 @@
       include_tasks: includes/samba.yml
       tags:
         - samba
-    - name: include samba tasks
+    - name: include minidlna tasks
       include_tasks: includes/minidlna.yml
       tags:
         - dlna

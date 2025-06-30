@@ -7,7 +7,7 @@
   with_items:
     - minidlna
 
-- name: Configure global samba
+- name: Configure minidlna
   become: yes
   template:
     src: templates/minidlna/minidlna.conf
