@@ -2,3 +2,4 @@
 *.retry
 passwd.yml
 Notes.md
+.venv
