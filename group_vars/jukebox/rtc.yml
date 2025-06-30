@@ -8,12 +8,19 @@
 #   sleeptime: how much time (s) rtcwake must sleep
 #   state: present (default) or absent, create or delete the cron job
 rtcwake:
-  # extinction de 01:00 à 01:55 LMMJVSD
+#  # extinction de 01:00 à 01:55 LMMJVSD
+#  - name: "Night stop"
+#    minute: "00"
+#    hour: "01"
+#    weekday: "1-7"
+#    sleep_time: 3300
+#    state: present
+  # extinction de 01:00 à 03:55 LMMJVSD
   - name: "Night stop"
     minute: "00"
     hour: "01"
     weekday: "1-7"
-    sleep_time: 3300
+    sleep_time: 10500
     state: present
   # extinction de 02:30 à 03:55 LMMJV
   - name: "Music Library Update stop"
@@ -21,7 +28,7 @@ rtcwake:
     hour: "02"
     weekday: "1-5"
     sleep_time: 5100
-    state: present
+    state: absent
     # extinction de 05:00 à 06:00 LMMJV
   - name: "Server Update stop"
     minute: "00"
@@ -34,7 +41,7 @@ rtcwake:
     minute: "30"
     hour: "08"
     weekday: "1-5"
-    sleep_time: 32430
+    sleep_time: 34200
     state: absent
   # extinction de 02:30 à 08:00 SD
   - name: "Weekend stop"
