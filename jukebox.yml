@@ -31,33 +31,35 @@
 
   handlers:
     - name: restart smbd
-      become: yes
+      become: true
       service:
         name: smbd
         state: restarted
       listen:
         - restart samba
     - name: restart nmbd
-      become: yes
+      become: true
       service:
         name: nmbd
         state: restarted
       listen:
         - restart samba
     - name: restart minidlna
-      become: yes
+      become: true
       service:
         name: minidlna
         state: restarted
       listen:
         - restart minidlna
     - name: restart apt-daily.timer
+      become: true
       systemd:
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true
         name: apt-daily.timer
     - name: restart service apt-daily-upgrade.timer
+      become: true
       systemd:
         state: restarted
-        daemon_reload: yes
+        daemon_reload: true
         name: apt-daily-upgrade.timer
