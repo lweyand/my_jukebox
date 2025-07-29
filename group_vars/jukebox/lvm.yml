@@ -1,7 +1,7 @@
 ---
 
-default_target_device: "/dev/sda3"
-default_target_size: "210G"
+default_target_devices: "/dev/sda3,/dev/sdb"
+default_target_size: "434G"
 
 lvm_vg_name: "music_g"
 lvm_lv_name: "home_music"

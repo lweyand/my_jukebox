@@ -7,76 +7,43 @@
     state: present
 
 
-- name: Unmount {{ target_dir }}
+- name: Unmount {{ target_dir }}
   become: yes
   mount:
-    path: "{{ target_dir }}"
+    path: "{{ target_dir }}"
     state: unmounted
 
-- name: get vg names list
-  become: yes
-  shell: vgs --noheadings -o vg_name | tr -d '  '
-  register: vg_names
-
-  #- name: get device mapped on {{ target_dir }}
-  #  shell: "df -P | grep {{ target_dir }} | awk '{print $1}'"
-  #  register: device_name
-  #- name: get device size on {{ target_dir }}
-  #  shell: "df -P -h | grep {{ target_dir }} | awk '{print $2}'"
-  #  register: device_size
-- name: get existing pv device
-  #  shell: pvs -o pv_name,dev_size,vg_name --noheadings | grep {{ lvm_vg_name }}
-  #  register: vg_size
-#  when: lvm_vg_name in vg_names.stdout_lines
-  set_fact:
-    device_name: "{{ default_target_device }}"
-
-- name: get existing vg size
-  #  shell: vgs {{ lvm_vg_name }} --units g -o vg_size --noheadings
-  #  register: vg_size
-#  when: lvm_vg_name in vg_names.stdout_lines
-  set_fact:
-    device_size: "{{ default_target_size }}"
-
-
-- name: Create a volume group on top of {{ device_name }} with physical extent size = {{ device_size }}
+- name: Create a volume group on top of {{ default_target_devices }}
   become: yes
   lvg:
     vg: "{{ lvm_vg_name }}"
-    pvs: "{{ device_name }}"
-#    pesize: "{{ device_size }}"
-  when: "lvm_vg_name not in vg_names.stdout_lines"
+    pvs: "{{ default_target_devices }}"
+    pvresize: true
 
-- name: debug pv
-  become: yes
-  command: pvscan
-
-- name: debug vg
-  become: yes
-  command: vgscan
-
-- name: Create a logical volume  {{ lvm_lv_name }} of {{ device_size }}
+- name: Create a logical volume  {{ lvm_lv_name }} of {{ default_target_size }}
   become: yes
   lvol:
     vg: "{{ lvm_vg_name }}"
     lv: "{{ lvm_lv_name }}"
-    size: "{{ device_size }}"
+    size: "{{ default_target_size }}"
+    resizefs: true
+  register: lvol_result
 
-- name: Get lv path
-  become: yes
-  shell: lvs {{ lvm_vg_name }} -o lv_path --noheadings  | tr -d '  '
-  register: lv_path
+- name: Set lv_path
+  set_fact:
+    lv_path: "/dev/{{ lvol_result.vg }}/{{ lvol_result.lv }}"
 
-- name: format logical volume  {{ lv_path.stdout }}
+- name: format logical volume  {{ lv_path }}
   become: yes
   filesystem:
     fstype: ext4
-    dev: "{{ lv_path.stdout }}"
+    dev: "{{ lv_path }}"
+    resizefs: true
 
-- name: mount {{ lv_path.stdout }}
+- name: mount {{ target_dir }}
   become: yes
   mount:
-    path: "{{ target_dir }}"
-    src: "{{ lv_path.stdout }}"
+    path: "{{ target_dir }}"
+    src: "{{ lv_path }}"
     fstype: ext4
     state: mounted

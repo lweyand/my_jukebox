@@ -38,7 +38,7 @@
   become: yes
   file:
     state: directory
-    path: "{{ uau_daily_download_timer_dir_target }}"
+    path: "{{ uau_daily_download_timer_dir_target }}"
 
 - name: Configure daily download timer
   become: yes
@@ -51,7 +51,7 @@
   become: yes
   file:
     state: directory
-    path: "{{ uau_daily_upgrades_timer_dir_target }}"
+    path: "{{ uau_daily_upgrades_timer_dir_target }}"
 
 - name: Configure upgrades download timer
   become: yes

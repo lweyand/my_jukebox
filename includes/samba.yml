@@ -13,7 +13,7 @@
   file:
     path: "{{ samba_home_dir }}"
     state: directory
-    mode: 02770
+    mode: "02770"
     owner: "{{ user }}"
     group: "jukebox"
 
@@ -32,6 +32,6 @@
     dest: /etc/samba/smb.conf
     owner: root
     group: root
-    mode: 0644
+    mode: "0644"
   notify:
     - restart samba
